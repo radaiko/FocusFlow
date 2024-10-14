@@ -1,0 +1,28 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="sidebar" id="navMenu" style="@(isNavMenuVisible ? "display:block;" : "display:none;")">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <button @onclick="ToggleNavMenu">☰</button>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    // TODO: move the nan menu to the sidebar
+    // TODO: on the left add a file view with a list of files, on clicking on one load the content in the editor
+    private bool isNavMenuVisible = false;
+
+    private void ToggleNavMenu()
+    {
+        isNavMenuVisible = !isNavMenuVisible;
+    }
+}
