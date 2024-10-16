@@ -7,7 +7,7 @@
 // Last Modified By   : aikoradlingmayr
 // Last Modified On   : 15-10-2024
 // ***********************************************************************
-namespace FocusFlowWeb.Models;
+namespace FocusFlowWasm.Models;
 
 // DailyNote
   // Human Description

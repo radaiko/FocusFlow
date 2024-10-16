@@ -9,7 +9,8 @@
 // ***********************************************************************
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
+
+namespace FocusFlowWasm.Models;
 
 // Settings
 // Human Description
@@ -49,6 +50,6 @@ public class Settings : INotifyPropertyChanged {
   }
 
   private void SaveSettings() {
-    DataHandler.SaveSettings(this);
+    // TODO: Implement saving settings with GoogleDriveService
   }
 }
