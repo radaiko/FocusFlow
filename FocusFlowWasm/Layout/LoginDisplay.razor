@@ -1,0 +1,39 @@
+﻿@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+
+<AuthorizeView>
+    <Authorized>
+        <span class="d-inline-block">
+            Hello, @context.User.Identity?.Name
+        </span>
+        <img src="@UserImg" width="22" height="22" class="@StyleHidden"/>
+        <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
+    </Authorized>
+    <NotAuthorized>
+        <a href="authentication/login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    private string UserImg { get; set; }
+    private string StyleHidden { get; set; } = "invisible";
+    private Timer? _timer;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender) {
+            var userImg = await LocalStorage.GetItemAsStringAsync("userImg") ?? "";
+            while (userImg.Length == 0) {
+                userImg = await LocalStorage.GetItemAsStringAsync("userImg") ?? "";
+                await Task.Delay(1000);
+            }
+            UserImg = userImg;
+            StyleHidden = "d-inline-block rounded-circle border-0";
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+    public void BeginLogOut() {
+        Navigation.NavigateToLogout("authentication/logout");
+    }
+}

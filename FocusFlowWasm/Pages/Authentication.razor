@@ -1,0 +1,42 @@
+﻿@page "/authentication/{action}"
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Blazored.LocalStorage
+@using FocusFlowWasm.Utils
+@inject ILocalStorageService LocalStorage
+
+<RemoteAuthenticatorView Action="@Action" OnLogOutSucceeded="HandleLogOutSucceeded" OnLogInSucceeded="HandleLoginSucceeded"/>
+
+@code {
+
+    [Parameter] public string? Action { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private async Task HandleLogOutSucceeded(RemoteAuthenticationState arg) {
+        await LocalStorage.ClearAsync();
+    }
+
+    private async Task HandleLoginSucceeded(RemoteAuthenticationState arg) {
+        var authState = await authenticationStateTask;
+        RLog.Debug($"AuthState: {authState.User.Identity?.Name}");
+        
+        var user = authState.User;
+        RLog.Debug($"User: {user.Identity?.Name}");
+        
+        var img = user.FindFirst("picture")?.Value;
+        RLog.Debug($"Img: {img}");
+        
+        var uid = user.FindFirst("sub")?.Value; // UID of the Google Account
+        RLog.Debug($"UID: {uid}");
+        
+        var token = user.FindFirst("access_token")?.Value;
+        RLog.Debug($"Token: {token}");
+
+        foreach (var claim in user.Claims) {
+            RLog.Debug($"Claim: {claim.Type} - {claim.Value}");
+        }
+        
+        await LocalStorage.SetItemAsStringAsync("userImg", img);
+    }
+}

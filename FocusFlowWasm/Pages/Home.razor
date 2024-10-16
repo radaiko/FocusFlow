@@ -1,0 +1,66 @@
+﻿@page "/"
+@using System.Text
+@using FocusFlowWasm.Models
+@using FocusFlowWasm.Services
+@using FocusFlowWasm.Utils
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject IAccessTokenProvider TokenProvider
+@inject IJSRuntime JSRuntime
+@inject GoogleDriveService GoogleDriveService
+
+<AuthorizeView>
+    <Authorized>
+        <PageTitle>FocusFlow for @context.User.Identity?.Name</PageTitle>
+
+        <ul>
+            @foreach (var file in _files) {
+                <li>
+                    @file.Name <button @onclick="() => DeleteFile(file)">Delete</button>
+                </li>
+            }
+        </ul>
+
+        <button @onclick="RefreshFiles">Refresh</button>
+        <button @onclick="UploadSettings">UploadSettings</button>
+
+    </Authorized>
+    <NotAuthorized>
+        <p> You’re not authorized to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private IEnumerable<GoogleDriveFile> _files = [];
+
+
+    private async Task<string> GetGoogleToken() {
+        var result = await TokenProvider.RequestAccessToken();
+        return result.TryGetToken(out var accessToken) ? accessToken.Value : string.Empty;
+    }
+
+    protected override async Task OnInitializedAsync() {
+        var token = await GetGoogleToken();
+        if (token != string.Empty) {
+            GoogleDriveService.Init(token);
+        }
+    }
+
+    private async Task RefreshFiles() {
+        RLog.Debug("Refreshing files");
+        _files = await GoogleDriveService.GetFiles();
+
+        RLog.Debug($"Files: {_files.Count()}");
+        StateHasChanged();
+    }
+
+    private async Task UploadSettings() {
+        var dummyJson = "{\"settings\":{\"theme\":\"dark\",\"notifications\":true,\"language\":\"en\"},\"user\":{\"name\":\"Test User\",\"email\":\"testuser@example.com\"}}";
+        await GoogleDriveService.UploadFile("settings.json", dummyJson);
+        await RefreshFiles();
+    }
+
+    private async Task DeleteFile(GoogleDriveFile file) {
+        await GoogleDriveService.DeleteFile(file.Id);
+        await RefreshFiles();
+    }
+}
