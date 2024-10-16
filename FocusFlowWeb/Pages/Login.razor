@@ -1,0 +1,46 @@
+@page "/login"
+@using FocusFlowWeb.Services
+@using FocusFlowWeb.Utils
+@using Google.Apis.Drive.v3
+@inject NavigationManager Navigation
+@inject GoogleAuthStateProvider AuthStateProvider
+
+<h3>Login</h3>
+<div>
+    <button @onclick="LoginWithGoogle">Login with Google</button>
+</div>
+
+@code {
+    private async Task LoginWithGoogle()
+    {
+        Logger.Debug("Login button clicked");
+        var returnUrl = Navigation.ToAbsoluteUri("/redirect");
+        Logger.Debug($"returnUrl: {returnUrl}");
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            Logger.Debug("User is already authenticated");
+            Navigation.NavigateTo(returnUrl.ToString(), true);
+        }
+        else
+        {
+            Logger.Debug("User is not authenticated, redirecting to Google login");
+
+            if (user.Identity.IsAuthenticated) {
+                AuthStateProvider.NotifyUserAuthentication(user);
+                Logger.Debug("User is authenticated: " + user.Identity.IsAuthenticated);
+            }
+            else {
+                Logger.Debug("User is not authenticated: " + user.Identity.IsAuthenticated);
+                Logger.Debug("Redirecting to Google login page");
+                var loginUrl = $"https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/cloud-platform&response_type=code&access_type=offline&redirect_uri={returnUrl.ToString()}&client_id={AuthStateProvider.GetClientId}";
+                Logger.Debug($"loginUrl: {loginUrl}");
+                Navigation.NavigateTo(loginUrl, true);
+                Logger.Debug("Redirected to Google login page");
+            }
+        }
+    }
+}

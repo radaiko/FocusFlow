@@ -1,0 +1,19 @@
+@page "/authentication/login-callback"
+@using FocusFlowWeb.Services
+@inject NavigationManager Navigation
+@inject GoogleAuthStateProvider AuthStateProvider
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated ?? false)
+        {
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
+}

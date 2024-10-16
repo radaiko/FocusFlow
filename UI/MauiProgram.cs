@@ -1,14 +1,17 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CommunityToolkit.Maui;
+using Core;
+using UI.Services;
+using UI.Utils;
 
 namespace UI;
 
-public static class MauiProgram
-{
+public static class MauiProgram {
 	public static MauiApp CreateMauiApp()
 	{
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
+			//.UseMauiCommunityToolkit()
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -16,9 +19,16 @@ public static class MauiProgram
 
 		builder.Services.AddMauiBlazorWebView();
 
+		builder.Services.AddSingleton<SettingsService>();
+		//builder.Services.AddSingleton<IFolderPickerService, FolderPickerService>();
+
+		
+		Logger.AddConsole();
+		Logger.AddFile(DataHandler.GetLogPath());
+
 #if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();
-		builder.Logging.AddDebug();
+		Logger.AddDebug();
 #endif
 
 		return builder.Build();

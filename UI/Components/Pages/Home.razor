@@ -1,27 +1,31 @@
 ﻿@page "/"
 
+@using UI.Services
+
+@inject SettingsService SettingsService
+@inject FolderPickerService FolderPickerService
+
 <h1>FocusFlow</h1>
 
-<div id="editor" contenteditable="true">
-    Start typing here...
+<div class="menu-view">
+    <p>Storage Directory: @SettingsService.Settings.StorageDirectory</p>
+    <button @onclick="async () => SettingsService.Settings.StorageDirectory = await PickFolderAsync()">Pick Folder</button>
+    <p>Selected Folder: @SettingsService.Settings.StorageDirectory</p>
+</div>
+
+<div class="projects-view">
+    <!-- Projects content here -->
+</div>
+
+<div class="editors-view">
+    <div id="editor" contenteditable="true" class="editor">
+        Start typing here...
+    </div>
 </div>
 
 @code {
-    // TODO: implements todos, todos can have a priority, a date and a description
-    // TODO: extend the editor with a todo generator out of context
-    // TODO: add formatting options to the editor, bold, italic, underline, strikethrough, code, quote, list, link, image
-    // TODO: add code highlighting to the editor and indicator what is code like markdown
-    // TODO: add a global todo list to the nav menu
-    // TODO: editor triggers for formatting, todo, code, link, image should be hinted on the right side
-    // TODO: TAB should indent, SHIFT+TAB should outdent
-    // TODO: implement extend/collapse for the file with command+. for collapsing this and all lower
-    // TODO: add shortcut to show and hide file pane
-    // TODO: add bookmark feature and shortcut for adding bookmarks
-    // TODO: add bookmark overview with clicking on a bookmark jump to the bookmarked position
-    // TODO: implement day feature which adds lines for today with date, adds a template of meeting which can be set and adds open todos as preview to it.
-            // if a todo is checked make it permanent in the day view
-    // TODO: add a swap with previous line, add a swap with next line
-    // TODO: add a search feature with highlighting
-    // TODO: open file in native os browser or editor
-    // TODO: add shortcuts for formatting
+    private async Task<string> PickFolderAsync() {
+        //return await FolderPickerService.PickFolderAsync();
+        return string.Empty;
+    }
 }
